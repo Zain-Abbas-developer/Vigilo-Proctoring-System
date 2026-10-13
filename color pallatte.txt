@@ -1,0 +1,21 @@
+color pallatte:
+
+indigo for button, header.etc
+purple
+white in button and something else
+black for other on white page
+
+
+Light mode:
+Background  → White
+Cards       → White
+Text        → Slate
+Primary     → Indigo #6366F1
+
+Dark mode:
+Background  → #0F172A
+Cards       → #1E293B
+Sidebar     → #111827
+Text        → #F8FAFC
+Secondary   → #94A3B8
+Primary     → #818CF8

@@ -1,0 +1,9 @@
+Django
+djangorestframework
+django-cors-headers
+opencv-python
+mediapipe
+numpy
+python-dotenv
+insightface==2.1
+onnxruntime>=1.20.1

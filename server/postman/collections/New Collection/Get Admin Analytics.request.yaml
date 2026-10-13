@@ -1,0 +1,9 @@
+$kind: http-request
+order: 2000
+url: 'http://localhost:3000/api/analytics/admin'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{TOKEN}}'

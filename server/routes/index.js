@@ -1,0 +1,26 @@
+import { Router } from 'express';
+import authRoutes from './authRoutes.js';
+import userRoutes from './userRoutes.js';
+import examRoutes from './examRoutes.js';
+import questionRoutes from './questionRoutes.js';
+import attemptRoutes from './attemptRoutes.js';
+import resultRoutes from './resultRoutes.js';
+import violationRoutes from './violationRoutes.js';
+import notificationRoutes from './notificationRoutes.js';
+import analyticsRoutes from './analyticsRoutes.js';
+import reportRoutes from './reportRoutes.js';
+import aiRoutes from './aiRoutes.js';
+
+const router = Router();
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/exams', examRoutes);
+router.use('/questions', questionRoutes);
+router.use('/attempts', attemptRoutes);
+router.use('/results', resultRoutes);
+router.use('/violations', violationRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/analytics', analyticsRoutes);
+router.use('/reports', reportRoutes);
+router.use('/ai', aiRoutes);
+export default router;

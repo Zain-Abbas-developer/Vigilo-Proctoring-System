@@ -1,0 +1,28 @@
+# Environment variables and secrets
+.env
+client/.env
+server/.env
+ai-services/.env
+
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local configuration
+.DS_Store
+Thumbs.db
