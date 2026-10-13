@@ -10,8 +10,6 @@ export const attemptService = {
     return response.data.data;
   },
 
-  // Get existing active attempt
-  // Return null if no active attempt exists
   active: async (examId) => {
     try {
       const response = await api.get(
