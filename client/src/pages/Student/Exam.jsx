@@ -232,11 +232,11 @@ const Exam = () => {
         const response = await attemptService.submit(attemptId, auto);
         const submittedAttempt = getAttempt(response);
 
-        navigate(`/student/exam/${examId}/result`, {
+        navigate(`/student/exam/${examId}/thank-you`, {
           replace: true,
           state: {
             attemptId,
-            attempt: submittedAttempt,
+            // attempt: submittedAttempt,
             autoSubmitted: auto,
           },
         });

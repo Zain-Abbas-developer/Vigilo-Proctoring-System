@@ -303,3 +303,153 @@ export async function submitAttempt(user, attemptId, { auto = false } = {}) {
 
   return attempt;
 }
+
+
+//list all attempts for a student
+
+
+/**
+ * List attempts with role-based access control,
+ * pagination, and filters.
+ */
+export async function listAttempts(user, query = {}) {
+  if (!user?._id || !user?.role) {
+    throw ApiError.unauthorized("Authentication required");
+  }
+
+  const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
+  const limit = Math.min(
+    100,
+    Math.max(1, Number.parseInt(query.limit, 10) || 10)
+  );
+
+  const filter = {};
+
+  // Students can only see their own attempts.
+  if (user.role === "student") {
+    filter.student = user._id;
+  } else if (user.role === "teacher") {
+    // Teachers can only see attempts for their own exams.
+    const examFilter = { createdBy: user._id };
+
+    if (query.examId) {
+      if (!mongoose.isValidObjectId(query.examId)) {
+        throw ApiError.badRequest("Invalid exam ID");
+      }
+
+      examFilter._id = query.examId;
+    }
+
+    const exams = await Exam.find(examFilter).select("_id").lean();
+    const examIds = exams.map((exam) => exam._id);
+
+    filter.exam = { $in: examIds };
+
+    if (query.studentId) {
+      if (!mongoose.isValidObjectId(query.studentId)) {
+        throw ApiError.badRequest("Invalid student ID");
+      }
+
+      filter.student = query.studentId;
+    }
+  } else if (user.role === "admin") {
+    // Admins can view attempts across the system.
+    if (query.studentId) {
+      if (!mongoose.isValidObjectId(query.studentId)) {
+        throw ApiError.badRequest("Invalid student ID");
+      }
+
+      filter.student = query.studentId;
+    }
+
+    if (query.examId) {
+      if (!mongoose.isValidObjectId(query.examId)) {
+        throw ApiError.badRequest("Invalid exam ID");
+      }
+
+      filter.exam = query.examId;
+    }
+  } else {
+    throw ApiError.forbidden("You cannot access exam attempts");
+  }
+
+  const allowedStatuses = [
+    "in_progress",
+    "submitted",
+    "auto_submitted",
+    "expired",
+  ];
+
+  if (query.status) {
+    if (!allowedStatuses.includes(query.status)) {
+      throw ApiError.badRequest("Invalid attempt status");
+    }
+
+    filter.status = query.status;
+  }
+
+  const [items, total] = await Promise.all([
+    Attempt.find(filter)
+      .populate("student", "name email")
+      .populate("exam", "title subject")
+      .sort({ createdAt: -1, _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+
+    Attempt.countDocuments(filter),
+  ]);
+
+  return {
+    items,
+    pagination: {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPrevPage: page > 1,
+    },
+  };
+}
+
+/**
+ * Get one attempt while enforcing ownership and exam access.
+ */
+export async function getAttemptById(user, attemptId) {
+  if (!user?._id || !user?.role) {
+    throw ApiError.unauthorized("Authentication required");
+  }
+
+  if (!mongoose.isValidObjectId(attemptId)) {
+    throw ApiError.badRequest("Invalid attempt ID");
+  }
+
+  const attempt = await Attempt.findById(attemptId)
+    .populate("student", "name email")
+    .populate("exam", "title subject createdBy");
+
+  if (!attempt) {
+    throw ApiError.notFound("Attempt not found");
+  }
+
+  if (user.role === "student") {
+    if (
+      attempt.student._id.toString() !== user._id.toString()
+    ) {
+      throw ApiError.forbidden("You cannot access this attempt");
+    }
+  } else if (user.role === "teacher") {
+    if (
+      !attempt.exam ||
+      attempt.exam.createdBy?.toString() !== user._id.toString()
+    ) {
+      throw ApiError.forbidden("You cannot access this attempt");
+    }
+  } else if (user.role !== "admin") {
+    throw ApiError.forbidden("You cannot access this attempt");
+  }
+
+  return attempt;
+}
+

@@ -7,8 +7,9 @@ import StudentDashboard from "../pages/Student/Dashboard";
 import StudentExam from "../pages/Student/Exam";
 //available-exams-list
 import ExamList from "../pages/Student/Exams";
-//in exam student result
+//in exam student result & Thank-You page
 import StudentResult from "../pages/Student/Result";
+import ThankYou from '../pages/Student/ThankYou';
 //while checking previous exam result
 import PrevResult from '../pages/Student/CheckPrevResult';
 import StudentSetting from "../pages/Student/StdSetting";
@@ -56,8 +57,9 @@ const StudentRoutes = (
           {/* Exam page */}
           <Route path="start" element={<StudentExam />} />
 
-          {/* Individual Exam Result */}
-          <Route path="result" element={<StudentResult />} />
+          {/* Individual Exam Result & Thank-You page */}
+          {/* <Route path="result" element={<StudentResult />} /> */}
+          <Route path="thank-you" element={<ThankYou />} />
         </Route>
 
         {/* Past Results */}
