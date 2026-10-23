@@ -31,12 +31,8 @@ const Login = () => {
         email: formData.email,
         password: formData.password,
       });
-      console.log("Login response:", response);
 
       const loggedInUser = response;
-
-      console.log("Login User: ", loggedInUser);
-      console.log("Login User Role: ", loggedInUser?.role);
 
       if(!loggedInUser?.role) {
         throw new Error("Invalid user role.");

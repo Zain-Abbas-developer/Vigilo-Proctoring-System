@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { analyticsService } from '../../services/analyticsService.js';
+import { analyticsService } from "../../services/analyticsService.js";
 import {
   AreaChart,
   Area,
@@ -14,7 +14,7 @@ import {
   Pie,
   Cell,
   Legend,
-} from 'recharts';
+} from "recharts";
 
 import {
   BookOpen,
@@ -30,9 +30,8 @@ import {
   ArrowDownRight,
 } from "lucide-react";
 
-
 //real case
-const COLORS = ['#22c55e', '#84cc16', '#f59e0b', '#f97316', '#ef4444'];
+const COLORS = ["#22c55e", "#84cc16", "#f59e0b", "#f97316", "#ef4444"];
 
 const Dashboard = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -42,16 +41,17 @@ const Dashboard = () => {
   useEffect(() => {
     let active = true; // To prevent state updates on unmounted component
 
-    analyticsService.admin()
-    .then((data) => {
-      if (active) setAnalytics(data);
-    })
-    .catch(() => {
-      if (active) setError("Unable to load Dashboard analytics");
-    })
-    .finally(() => {
-      if (active) setLoading(false);
-    });
+    analyticsService
+      .admin()
+      .then((data) => {
+        if (active) setAnalytics(data);
+      })
+      .catch(() => {
+        if (active) setError("Unable to load Dashboard analytics");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
 
     return () => {
       active = false; // Cleanup function to set active to false when component unmounts
@@ -66,11 +66,22 @@ const Dashboard = () => {
     return <div className="p-6 text-red-500">{error}</div>;
   }
 
+  const flaggedStudentsData = analytics?.flaggedStudents;
+
   const dashboardStats = {
     totalExams: analytics?.totalExams ?? 0,
     activeExams: analytics?.activeExams ?? 0,
     totalStudents: analytics?.totalStudents ?? 0,
-    flaggedStudents: analytics?.flaggedStudents ?? 0,
+
+    flaggedStudents: Array.isArray(flaggedStudentsData)
+      ? flaggedStudentsData.length
+      : typeof flaggedStudentsData === "number"
+        ? flaggedStudentsData
+        : typeof flaggedStudentsData === "object" &&
+            flaggedStudentsData !== null
+          ? (flaggedStudentsData.violationCount ?? 1)
+          : 0,
+
     violationsToday: analytics?.violationsToday ?? 0,
     avgRiskScore: analytics?.avgRiskScore ?? 0,
     liveExams: analytics?.liveExams ?? [],
@@ -85,68 +96,67 @@ const Dashboard = () => {
   };
 
   const statCards = [
-  {
-    label: "Total Exams",
-    value: dashboardStats.totalExams,
-    icon: BookOpen,
-    color: "from-indigo-500 to-indigo-600",
-    bgColor: "bg-indigo-50",
-    textColor: "text-indigo-600",
-    change: "+3",
-    trend: "up",
-  },
-  {
-    label: "Active Exams",
-    value: dashboardStats.activeExams,
-    icon: Activity,
-    color: "from-emerald-500 to-emerald-600",
-    bgColor: "bg-emerald-50",
-    textColor: "text-emerald-600",
-    change: "+1",
-    trend: "up",
-  },
-  {
-    label: "Total Students",
-    value: dashboardStats.totalStudents,
-    icon: Users,
-    color: "from-blue-500 to-blue-600",
-    bgColor: "bg-blue-50",
-    textColor: "text-blue-600",
-    change: "+28",
-    trend: "up",
-  },
-  {
-    label: "Flagged Students",
-    value: dashboardStats.flaggedStudents,
-    icon: AlertTriangle,
-    color: "from-red-500 to-red-600",
-    bgColor: "bg-red-50",
-    textColor: "text-red-600",
-    change: "-2",
-    trend: "down",
-  },
-  {
-    label: "Violations Today",
-    value: dashboardStats.violationsToday,
-    icon: Shield,
-    color: "from-amber-500 to-amber-600",
-    bgColor: "bg-amber-50",
-    textColor: "text-amber-600",
-    change: "+12",
-    trend: "up",
-  },
-  {
-    label: "Avg Risk Score",
-    value: `${dashboardStats.avgRiskScore}%`,
-    icon: Zap,
-    color: "from-purple-500 to-purple-600",
-    bgColor: "bg-purple-50",
-    textColor: "text-purple-600",
-    change: "-5%",
-    trend: "down",
-  },
-];
-
+    {
+      label: "Total Exams",
+      value: dashboardStats.totalExams,
+      icon: BookOpen,
+      color: "from-indigo-500 to-indigo-600",
+      bgColor: "bg-indigo-50",
+      textColor: "text-indigo-600",
+      change: "+3",
+      trend: "up",
+    },
+    {
+      label: "Active Exams",
+      value: dashboardStats.activeExams,
+      icon: Activity,
+      color: "from-emerald-500 to-emerald-600",
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-600",
+      change: "+1",
+      trend: "up",
+    },
+    {
+      label: "Total Students",
+      value: dashboardStats.totalStudents,
+      icon: Users,
+      color: "from-blue-500 to-blue-600",
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-600",
+      change: "+28",
+      trend: "up",
+    },
+    {
+      label: "Flagged Students",
+      value: dashboardStats.flaggedStudents,
+      icon: AlertTriangle,
+      color: "from-red-500 to-red-600",
+      bgColor: "bg-red-50",
+      textColor: "text-red-600",
+      change: "-2",
+      trend: "down",
+    },
+    {
+      label: "Violations Today",
+      value: dashboardStats.violationsToday,
+      icon: Shield,
+      color: "from-amber-500 to-amber-600",
+      bgColor: "bg-amber-50",
+      textColor: "text-amber-600",
+      change: "+12",
+      trend: "up",
+    },
+    {
+      label: "Avg Risk Score",
+      value: `${dashboardStats.avgRiskScore}%`,
+      icon: Zap,
+      color: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-50",
+      textColor: "text-purple-600",
+      change: "-5%",
+      trend: "down",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -176,8 +186,12 @@ const Dashboard = () => {
                   {stat.change}
                 </span>
               </div>
-              <p className="text-2xl font-bold text-slate-800 dark:text-[#F8FAFC]">{stat.value}</p>
-              <p className="text-xs text-slate-500 mt-0.5 dark:text-[#F8FAFC]">{stat.label}</p>
+              <p className="text-2xl font-bold text-slate-800 dark:text-[#F8FAFC]">
+                {stat.value}
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5 dark:text-[#F8FAFC]">
+                {stat.label}
+              </p>
             </div>
           );
         })}
@@ -188,8 +202,12 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-6 border border-slate-200/60 dark:border-indigo-400/60">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC]">Violations Timeline</h3>
-              <p className="text-sm text-slate-500 mt-0.5 dark:text-[#F8FAFC]">Real-time violation tracking</p>
+              <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC]">
+                Violations Timeline
+              </h3>
+              <p className="text-sm text-slate-500 mt-0.5 dark:text-[#F8FAFC]">
+                Real-time violation tracking
+              </p>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -199,7 +217,13 @@ const Dashboard = () => {
           <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={chartData.violationsByHour}>
               <defs>
-                <linearGradient id="violationGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient
+                  id="violationGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
                   <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                 </linearGradient>
@@ -209,9 +233,9 @@ const Dashboard = () => {
               <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
               <Tooltip
                 contentStyle={{
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                  borderRadius: "12px",
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
                 }}
               />
               <Area
@@ -220,7 +244,7 @@ const Dashboard = () => {
                 stroke="#6366f1"
                 fill="url(#violationGradient)"
                 strokeWidth={2.5}
-                dot={{ r: 4, fill: '#6366f1' }}
+                dot={{ r: 4, fill: "#6366f1" }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -230,25 +254,42 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-6 border border-slate-200/60 dark:border-indigo-400/60">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC]">Violations by Type</h3>
-              <p className="text-sm text-slate-500 mt-0.5 dark:text-[#F8FAFC]">Breakdown of violation categories</p>
+              <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC]">
+                Violations by Type
+              </h3>
+              <p className="text-sm text-slate-500 mt-0.5 dark:text-[#F8FAFC]">
+                Breakdown of violation categories
+              </p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={chartData.violationsByType} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#f1f5f9"
+                horizontal={false}
+              />
               <XAxis type="number" tick={{ fontSize: 12 }} stroke="#94a3b8" />
-              <YAxis type="category" dataKey="type" tick={{ fontSize: 11 }} stroke="#94a3b8" width={110} />
+              <YAxis
+                type="category"
+                dataKey="type"
+                tick={{ fontSize: 11 }}
+                stroke="#94a3b8"
+                width={110}
+              />
               <Tooltip
                 contentStyle={{
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                  borderRadius: "12px",
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
                 }}
               />
               <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={16}>
                 {chartData.violationsByType.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={chartData.violationsByType[index].fill} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={chartData.violationsByType[index].fill}
+                  />
                 ))}
               </Bar>
             </BarChart>
@@ -259,8 +300,12 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Risk Distribution */}
         <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-6 border border-slate-200/60 dark:border-indigo-400/60">
-          <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC] mb-1">Risk Distribution</h3>
-          <p className="text-sm text-slate-500 dark:text-[#F8FAFC] mb-4">Student risk score breakdown</p>
+          <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC] mb-1">
+            Risk Distribution
+          </h3>
+          <p className="text-sm text-slate-500 dark:text-[#F8FAFC] mb-4">
+            Student risk score breakdown
+          </p>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
@@ -279,13 +324,15 @@ const Dashboard = () => {
               </Pie>
               <Tooltip
                 contentStyle={{
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
+                  borderRadius: "12px",
+                  border: "1px solid #e2e8f0",
                 }}
               />
               <Legend
-                wrapperStyle={{ fontSize: '12px' }}
-                formatter={(value) => <span className="text-slate-600">{value}</span>}
+                wrapperStyle={{ fontSize: "12px" }}
+                formatter={(value) => (
+                  <span className="text-slate-600">{value}</span>
+                )}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -295,11 +342,15 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-6 border border-slate-200/60 dark:border-indigo-400/60">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC]">Live Exams</h3>
-              <p className="text-sm text-slate-500 mt-0.5 dark:text-[#F8FAFC]">{dashboardStats.liveExams?.length} exams in progress</p>
+              <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC]">
+                Live Exams
+              </h3>
+              <p className="text-sm text-slate-500 mt-0.5 dark:text-[#F8FAFC]">
+                {dashboardStats.liveExams?.length} exams in progress
+              </p>
             </div>
             <button
-              onClick={() => setCurrentView('live-monitor')}
+              onClick={() => setCurrentView("live-monitor")}
               className="text-xs text-indigo-600 font-medium hover:text-indigo-700 flex items-center gap-1 dark:text-indigo-500 dark:hover:text-indigo-500/70 transition-all duration-100"
             >
               <Eye className="w-3.5 h-3.5" />
@@ -314,8 +365,12 @@ const Dashboard = () => {
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="text-sm font-medium text-slate-800 dark:text-[#F8FAFC]">{exam.title}</h4>
-                    <p className="text-xs text-slate-500 mt-1 dark:text-[#F8FAFC]">{exam.subject}</p>
+                    <h4 className="text-sm font-medium text-slate-800 dark:text-[#F8FAFC]">
+                      {exam.title}
+                    </h4>
+                    <p className="text-xs text-slate-500 mt-1 dark:text-[#F8FAFC]">
+                      {exam.subject}
+                    </p>
                   </div>
                   <span className="flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
@@ -341,11 +396,15 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-6 border border-slate-200/60 dark:border-indigo-400/60">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC]">Recent Violations</h3>
-              <p className="text-sm text-slate-500 mt-0.5 dark:text-[#F8FAFC]">Latest detected issues</p>
+              <h3 className="font-semibold text-slate-800 dark:text-[#F8FAFC]">
+                Recent Violations
+              </h3>
+              <p className="text-sm text-slate-500 mt-0.5 dark:text-[#F8FAFC]">
+                Latest detected issues
+              </p>
             </div>
             <button
-              onClick={() => setCurrentView('violations')}
+              onClick={() => setCurrentView("violations")}
               className="text-xs text-indigo-600 font-medium hover:text-indigo-700 flex items-center gap-1 dark:text-indigo-500 dark:hover:text-indigo-500/70 transition-all duration-100"
             >
               <TrendingUp className="w-3.5 h-3.5" />
@@ -353,23 +412,32 @@ const Dashboard = () => {
             </button>
           </div>
           <div className="space-y-3">
-            {dashboardStats.recentViolations.map((v) => {
+            {dashboardStats?.recentViolations?.map((v) => {
               const severityColors = {
-                low: 'bg-blue-100 text-blue-700',
-                medium: 'bg-amber-100 text-amber-700',
-                high: 'bg-orange-100 text-orange-700',
-                critical: 'bg-red-100 text-red-700',
+                low: "bg-blue-100 text-blue-700",
+                medium: "bg-amber-100 text-amber-700",
+                high: "bg-orange-100 text-orange-700",
+                critical: "bg-red-100 text-red-700",
               };
               return (
-                <div key={v.id} className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#31415c] transition-colors">
+                <div
+                  key={v._id}
+                  className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#31415c] transition-colors"
+                >
                   <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center shrink-0 mt-0.5">
                     <AlertTriangle className="w-4 h-4 text-red-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-700 dark:text-[#F8FAFC] truncate">{v.description}</p>
-                    <p className="text-xs text-slate-500 mt-0.5 dark:text-[#F8FAFC]">{v.studentName}</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-[#F8FAFC] truncate">
+                      {v.description}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5 dark:text-[#F8FAFC]">
+                      {v.studentName}
+                    </p>
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${severityColors[v.severity]}`}>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${severityColors[v.severity]}`}
+                  >
                     {v.severity.toUpperCase()}
                   </span>
                 </div>
